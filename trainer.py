@@ -1,0 +1,1 @@
+# Define a general trainer and test class for the models
