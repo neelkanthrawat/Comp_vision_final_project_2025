@@ -5,10 +5,11 @@ __pycache__/
 
 
 ### dataset related
+data_oxford_iiit
 annotations.tar.gz
 images.tar.gz
-images
-annotations
+# images
+# annotations
 
 
 # C extensions
