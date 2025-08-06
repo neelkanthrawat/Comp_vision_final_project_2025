@@ -1,0 +1,80 @@
+import os
+import torch
+from torch.utils.data import DataLoader
+import random
+
+def get_pet_dataloaders(
+    image_folder,
+    mask_folder,
+    DatasetClass,  # eg. send PreprocessedPetDataset class here
+    val_ratio=0.1,    # Portion for validation
+    test_ratio=0.1,   # Portion for testing
+    batch_size=16,
+    num_workers=4,
+    seed=42
+    ):
+    """
+    Creates PyTorch DataLoaders for the Oxford-IIIT Pet dataset with train, validation, and test splits.
+
+    Parameters:
+    -----------
+    image_folder : str
+        Path to the folder containing preprocessed/resized images.
+    mask_folder : str
+        Path to the folder containing corresponding segmentation masks.
+    DatasetClass : type
+        Dataset class to use
+    val_ratio : float, optional (default=0.1)
+        Fraction of the dataset to use for validation.
+    test_ratio : float, optional (default=0.1)
+        Fraction of the dataset to use for testing.
+    batch_size : int, optional (default=16)
+        Number of samples per batch to load.
+    num_workers : int, optional (default=4)
+        Number of subprocesses to use for data loading.
+    seed : int, optional (default=42)
+        Random seed for reproducible shuffling and splitting.
+
+    Returns:
+    --------
+    train_loader : DataLoader
+        DataLoader for the training set with shuffling enabled.
+    val_loader : DataLoader
+        DataLoader for the validation set without shuffling.
+    test_loader : DataLoader
+        DataLoader for the test set without shuffling.
+    """
+
+    # List all files in the image folder without filtering extensions
+    all_files = os.listdir(image_folder)
+    all_files.sort()  # Sort to ensure consistent order before shuffling
+
+    # Shuffle the list of filenames using a fixed seed for reproducibility
+    random.seed(seed)
+    all_files_shuffled = all_files.copy()
+    random.shuffle(all_files_shuffled)
+
+    total_size = len(all_files_shuffled)
+    test_size = int(total_size * test_ratio)
+    val_size = int(total_size * val_ratio)
+    train_size = total_size - val_size - test_size
+
+    # Split into train, val, and test lists
+    train_files = all_files_shuffled[:train_size] # Training files
+    val_files = all_files_shuffled[train_size:train_size + val_size]#val files
+    test_files = all_files_shuffled[train_size + val_size:]# Test files
+
+    # Create datasets for each split
+    if DatasetClass is None:
+        raise ValueError("You must provide a DatasetClass to use.")
+
+    train_dataset = DatasetClass(image_folder, mask_folder, train_files)
+    val_dataset = DatasetClass(image_folder, mask_folder, val_files)
+    test_dataset = DatasetClass(image_folder, mask_folder, test_files)
+
+    # Create DataLoaders for each split
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
+    return train_loader, val_loader, test_loader
