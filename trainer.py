@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import os  # likely for model saving/loading
+from tqdm import tqdm
 
 class trainer:
     def __init__(self, model, 
@@ -58,10 +59,10 @@ class trainer:
         self.val_iou_epoch_list = []
 
     ## these are the train, train_epoch and val_epoch functions we need:
-    def train(self):
-        for _ in range(self.num_epoch):
+    def train(self, k=1):
+        for epoch in tqdm(range(self.num_epoch), desc="Epochs"):
             # train and validation step for i'th epoch
-            avg_epoch_train_loss = self.train_epoch()
+            avg_epoch_train_loss = self.train_epoch(epoch=epoch)
             avg_epoch_val_loss, avg_epoch_val_dice, avg_epoch_val_iou = self.val_epoch()# unpack all three values returned by val_epoch
             
             # accumulate losses
@@ -72,13 +73,18 @@ class trainer:
             self.val_dice_epoch_list.append(avg_epoch_val_dice)
             self.val_iou_epoch_list.append(avg_epoch_val_iou)
 
-    def train_epoch(self):
+            if (epoch + 1) % k == 0:
+                print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f}")
+
+
+    def train_epoch(self, epoch=None):
         # training mode
         self.model.train()  
         # initialise cumulative loss
         loss_ith_epoch_minibatch_cummul = 0.0
         
-        for minibatch_input, truth in self.dataloaders['train']:
+        # for minibatch_input, truth in self.dataloaders['train']:
+        for minibatch_input, truth in tqdm(self.dataloaders['train'], desc=f"Epoch {epoch+1} - Training", leave=False):
             # move data to device
             minibatch_input, truth = minibatch_input.to(self.device), truth.to(self.device)
             # zero gradients
