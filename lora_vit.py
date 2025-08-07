@@ -8,12 +8,15 @@ from lora import LoraLayer
 class LoraVit(nn.Module):
     """ 
     This class is to introduce LoRA layer to the model.
-    vit_model: pre-trained vit model
-    r: rank
-    alpha: scaling strength for lora
-    lora_layers: Layers we want to apply lora to
     """
     def __init__(self, vit_model, r:int, alpha:int, lora_layers=None):
+
+        """ 
+        vit_model: pre-trained vit model
+        r: rank
+        alpha: scaling strength for lora
+        lora_layers: Layers we want to apply lora to
+        """
         super().__init__()
 
         assert r>0, "r (rank of lora matrices) must be >0"
@@ -27,7 +30,7 @@ class LoraVit(nn.Module):
         
         # Dimension of the input vector to the transformer
         dim = vit_model.encoder.layer[0].attention.attention.query.in_features 
-        print(f"dim is: {dim}")
+        #print(f"dim is: {dim}")
         
         # freeze the parameters
         ## ? How can we invoke paramters in the vit_model
@@ -124,6 +127,12 @@ class LoraVit(nn.Module):
             b_v.weight.data.copy_(loaded[f'v_B_{i}'])
 
         print(f"Loaded LoRA params and layers from {filename}")
+
+    @property
+    def num_trainable_params(self):
+        """Number of trainable parameters in the model."""
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
 
 
     def forward(self, x:Tensor, **kwargs) -> Tensor:
