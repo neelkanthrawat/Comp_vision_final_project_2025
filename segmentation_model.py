@@ -30,6 +30,12 @@ class SegViT(nn.Module):
             patch_size=patch_size,
             image_size=image_size
         )
+
+    @property
+    def num_trainable_params(self):
+        """Number of trainable parameters in the model."""
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
     # note for me: maybe have an argument stating whether wanna remove the extra class token or not (if it is already removed)
     def forward(self, x): # shape of x: (B,N+1,D)
         """
@@ -39,19 +45,13 @@ class SegViT(nn.Module):
         3. Feed to custom segmentation head
         """
 
-        print(f"[Input] shape: {x.shape}, type: {type(x)}")
         x = self.vit(x)  # (B, N+1, D)
-        print(f"[After vit(x)] type: {type(x)}")
 
         # get the last state
         x= x.last_hidden_state # (B,N+1,D)
-        print(f"[After .last_hidden_state] shape: {x.shape}, type: {type(x)}")
 
         #x = x[:, :-1, :]  # Remove CLS token → (B, N, D)
         # I think it should be this:
         x = x[:,1:,:] # because it is the first token which is
-        print(f"x.shape after removing the CLS: {x.shape}")
         x = self.seg_head(x)  # (B, num_classes, H, W)
-        print(f"x.shape after segmentation head: {x.shape}")
-        # 
         return x
