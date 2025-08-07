@@ -34,6 +34,11 @@ class CustomSegHead(nn.Module):
         # Final conv layer: maps features to the number of classes with 1x1 convolution (pixel-wise classification)
         self.conv2 = nn.Conv2d(hidden_dim // 2, num_classes, kernel_size=1)
 
+    @property
+    def num_trainable_params(self):
+        """Number of trainable parameters in the model."""
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
     def forward(self, x):  # x shape: (B, N, D)
         """
         Input x's shape: (B,N,D)
@@ -52,20 +57,16 @@ class CustomSegHead(nn.Module):
             # -- Swaps dimensions 1 and 2 -> new shape is: (B,D,N) 
         # 2- reshape organizes tokens into 2D spatial layout: (B,D,N)--> (B,D,H,W)
         x = x.permute(0, 2, 1).reshape(B, D, H, W)
-        print(f"shape after permutation and rehaping: {x.shape}")
         
         # Apply first convolution and ReLU activation to learn local spatial features
         x = self.relu(self.conv1(x))
-        print(f"shape after first convolution: {x.shape}")
         
         # Apply final 1x1 convolution to produce per-class scores for each spatial location
         x = self.conv2(x)
-        print(f"shape after second convolution: {x.shape}")
         
         # Upsample output to match original image resolution
         # scale_factor = patch size because each patch corresponds to patch_size x patch_size pixels
         x = F.interpolate(x, scale_factor=self.patch_size, mode='bilinear', align_corners=False)
-        print(f"shape after interpolation: {x.shape}")
         
         # Return segmentation logits of shape (B, num_classes, H_img, W_img)
         return x
