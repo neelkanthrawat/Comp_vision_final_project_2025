@@ -11,7 +11,9 @@ def get_pet_dataloaders(
     test_ratio=0.1,   # Portion for testing
     batch_size=16,
     num_workers=4,
-    seed=42
+    seed=42,
+    all_data = True,
+    num_datapoints = 1000, # when we set all_data to False
     ):
     """
     Creates PyTorch DataLoaders for the Oxford-IIIT Pet dataset with train, validation, and test splits.
@@ -54,15 +56,21 @@ def get_pet_dataloaders(
     all_files_shuffled = all_files.copy()
     random.shuffle(all_files_shuffled)
 
-    total_size = len(all_files_shuffled)
+    if all_data:
+        total_size = len(all_files_shuffled)
+    else:
+        total_size = min(num_datapoints, len(all_files_shuffled))
+        print(f"[INFO] Using only {total_size} datapoints out of {len(all_files_shuffled)} total files.")
+
     test_size = int(total_size * test_ratio)
     val_size = int(total_size * val_ratio)
     train_size = total_size - val_size - test_size
+    print(f"train_size: {train_size}, val_size: {val_size} and test_size: {test_size}")
 
     # Split into train, val, and test lists
     train_files = all_files_shuffled[:train_size] # Training files
     val_files = all_files_shuffled[train_size:train_size + val_size]#val files
-    test_files = all_files_shuffled[train_size + val_size:]# Test files
+    test_files = all_files_shuffled[train_size + val_size:total_size]# Test files
 
     # Create datasets for each split
     if DatasetClass is None:
