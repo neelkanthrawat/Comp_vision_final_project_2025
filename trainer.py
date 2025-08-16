@@ -130,8 +130,10 @@ class trainer:
                 # accumulate loss for average caln later
                 loss_ith_epoch_minibatch_val_cummul += loss_val.item() * batch_size
                 # accumulate metrics
-                dice_cum += dice_score.item() if isinstance(dice_score, torch.Tensor) else dice_score
-                iou_cum += iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score
+                # dice_cum += dice_score.item() if isinstance(dice_score, torch.Tensor) else dice_score
+                # iou_cum += iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score
+                dice_cum += (dice_score.item() if isinstance(dice_score, torch.Tensor) else dice_score) * batch_size
+                iou_cum += (iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score) * batch_size
 
         # calculate average val loss for the epoch
         avg_epoch_val_loss = loss_ith_epoch_minibatch_val_cummul / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
