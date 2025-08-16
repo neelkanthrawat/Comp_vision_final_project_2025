@@ -52,7 +52,7 @@ def plot_random_images_and_trimaps_2(dataset_root='data_oxford_iiit', num_sample
         dataset_root (str): Root folder containing 'resized_images' and 'resized_masks' subfolders.
         num_samples (int, optional): Number of random samples to plot. Default is 10.
     """
-    # Resolve base directory
+    # Resolve base directory 
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
     except NameError:

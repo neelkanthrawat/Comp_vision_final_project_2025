@@ -7,10 +7,10 @@ class SegViT(nn.Module):
     Converts patch embeddings into full-resolution segmentation masks.
     """
 
-    def __init__(self,vit_model: nn.Module,
+    def __init__(self,vit_model: nn.Module,## vit_model us vit based backbone
                     image_size: int,
                     patch_size: int,
-                    dim: int,
+                    dim: int, # hidden dimension
                     n_classes: int,
                     ) -> None:
         super().__init__()
