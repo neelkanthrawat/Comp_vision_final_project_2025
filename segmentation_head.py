@@ -16,7 +16,15 @@ class CustomSegHead(nn.Module):
 
     image_size : The height/width of the input image in pixels (assumes square images). Used to calculate how many patches per spatial dimension.
     """
-    def __init__(self, hidden_dim:int, num_classes:int, patch_size:int, image_size:int):
+    def __init__(self, 
+                hidden_dim:int,
+                num_classes:int, 
+                patch_size:int, 
+                image_size:int,
+                use_bn:bool = False,          # Whether to use BatchNorm
+                use_dropout:bool = False,     # Whether to use Dropout
+                dropout_rate:float = 0.1      # Dropout probability
+    ):
         super().__init__()
         
         # Store the patch size (e.g., 16 for 16x16 patches)
@@ -27,9 +35,19 @@ class CustomSegHead(nn.Module):
 
         # First conv layer: reduces channels from hidden_dim to half, with 3x3 kernel for local spatial context
         self.conv1 = nn.Conv2d(hidden_dim, hidden_dim // 2, kernel_size=3, padding=1)
-        
+
+        # Optional batchnorm 
+        self.use_bn = use_bn
+        if use_bn:
+            self.bn1 = nn.BatchNorm2d(hidden_dim // 2)
+
         # ReLU activation after conv1 for non-linearity
         self.relu = nn.ReLU()
+
+        # Optional Dropout layer 
+        self.use_dropout = use_dropout 
+        if use_dropout:
+            self.drop1 = nn.Dropout2d(p=dropout_rate)
         
         # Final conv layer: maps features to the number of classes with 1x1 convolution (pixel-wise classification)
         self.conv2 = nn.Conv2d(hidden_dim // 2, num_classes, kernel_size=1)
@@ -59,7 +77,13 @@ class CustomSegHead(nn.Module):
         x = x.permute(0, 2, 1).reshape(B, D, H, W)
         
         # Apply first convolution and ReLU activation to learn local spatial features
-        x = self.relu(self.conv1(x))
+        ## x = self.relu(self.conv1(x))
+        x = self.conv1(x)
+        if self.use_bn:
+            x = self.bn1(x)
+        x = self.relu(x)
+        if self.use_dropout:
+            x = self.drop1(x)
         
         # Apply final 1x1 convolution to produce per-class scores for each spatial location
         x = self.conv2(x)
