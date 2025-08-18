@@ -11,7 +11,8 @@ class trainer:
                 optimizer,lr, 
                 criterion, num_epoch,
                 dataloaders, 
-                scheduler=None,device='cuda',
+                device='cuda',
+                use_trap_scheduler=False,
                 model_kwargs = None,
                 criterion_kwargs= {"num_classes": 2, "epsilon": 1e-6}):
         """
@@ -24,7 +25,7 @@ class trainer:
         criterion: Loss function used for both training and validation.
         num_epoch: Number of epochs to train the model.
         dataloaders (dict): Dictionary containing 'train' and 'val' DataLoader objects.
-        scheduler (optional): Learning rate scheduler (default: None).
+        use_trap_scheduler (bool): Whether to use a trapezoidal learning rate scheduler.
         device (str): Device to use for training ('cuda' or 'cpu') (default: 'cuda').
         model_kwargs (dict, optional): Additional keyword arguments to pass to the model during the forward pass.
         criterion_kwargs (dict, optional): Additional keyword arguments to pass to the criterion/loss function. 
@@ -43,12 +44,18 @@ class trainer:
         self.criterion_kwargs= criterion_kwargs 
         self.num_epoch = num_epoch
         self.dataloaders = dataloaders
-        self.scheduler = scheduler
         self.device = device
         self.model_kwargs = model_kwargs if model_kwargs is not None else {}
         
         # Calculate and store dataset sizes:
         self.dataset_sizes = {split: len(dataloader.dataset) for split, dataloader in dataloaders.items()}
+        # Following is needed for trapezoidal scheduler 
+        self.num_batches_per_epoch = len(self.dataloaders['train'])
+        self.total_batch_updates = self.num_batches_per_epoch * self.num_epoch
+        self.current_batch_step = 0
+        # these are for trapezoidal scheduler
+        if use_trap_scheduler:
+            self._setup_trapezoid_scheduler()
 
         ## error terms:
         self.train_error_epoch_list = []
@@ -57,6 +64,23 @@ class trainer:
         ## metrics lists:
         self.val_dice_epoch_list = []
         self.val_iou_epoch_list = []
+
+    ## 
+    def _setup_trapezoid_scheduler(self):
+        self.warmup_steps = int(0.05 * self.total_batch_updates)
+        self.decay_steps = int(0.2 * self.total_batch_updates)
+        self.plateau_steps = self.total_batch_updates - self.warmup_steps - self.decay_steps
+        self.scheduler = torch.optim.lr_scheduler.LambdaLR(self.optimizer, self._trapezoid_lr_lambda)# it adjusts the learning rate according to the trapezoidal schedule instead of using fixed steps like StepLR or ExponentialLR.
+
+    ## trapezoidal scheduler as a private method
+    def _trapezoid_lr_lambda(self, batch_step):
+        if batch_step < self.warmup_steps:
+            return float(batch_step) / max(1, self.warmup_steps)
+        elif batch_step < (self.warmup_steps + self.plateau_steps):
+            return 1.0
+        else:
+            return max(0.0, float(self.total_batch_updates - batch_step) / max(1, self.decay_steps))
+
 
     ## these are the train, train_epoch and val_epoch functions we need:
     def train(self, k=1):
@@ -97,6 +121,10 @@ class trainer:
             loss_ith_epoch_minibatch.backward()
             # optimizer step
             self.optimizer.step()
+            # update learning rate if using trapezoidal scheduler
+            if hasattr(self, 'scheduler'):
+                self.scheduler.step(self.current_batch_step)
+                self.current_batch_step += 1
             # accumulate the loss for average calculation later
             batch_size = minibatch_input.size(0)
             loss_ith_epoch_minibatch_cummul += loss_ith_epoch_minibatch.item() * batch_size
