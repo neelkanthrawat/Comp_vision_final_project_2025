@@ -6,7 +6,7 @@ class CustomSegHead(nn.Module):
     Custom defined segmentation head. This module takes the patch embeddings from a ViT backbone and
     processes them into a full-resolution segmentation map
 
-    Arguments:
+    Arguments: 
     ----------
     hidden_dim : The dimension of the patch embeddings from the ViT (e.g., 768 for ViT-Base).
         
