@@ -12,6 +12,7 @@ class SegViT(nn.Module):
                     patch_size: int,
                     dim: int, # hidden dimension
                     n_classes: int,
+                    head=None, # segmentation model
                     ) -> None:
         super().__init__()
         
@@ -24,12 +25,15 @@ class SegViT(nn.Module):
             del self.vit.lora_vit.fc
 
         # Use custom segmentation head
-        self.seg_head = CustomSegHead(
-            hidden_dim=dim,
-            num_classes=n_classes,
-            patch_size=patch_size,
-            image_size=image_size
-        )
+        if head==None:
+            self.seg_head = CustomSegHead(
+                hidden_dim=dim,
+                num_classes=n_classes,
+                patch_size=patch_size,
+                image_size=image_size
+            )
+        else:
+            self.seg_head = head
 
     @property
     def num_trainable_params(self):
