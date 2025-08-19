@@ -8,6 +8,7 @@ __pycache__/
 data_oxford_iiit
 annotations.tar.gz
 images.tar.gz
+wandb
 # images
 # annotations
 
