@@ -7,13 +7,18 @@ import os  # likely for model saving/loading
 from tqdm import tqdm
 
 class trainer:
-    def __init__(self, model, 
-                optimizer,lr, 
-                criterion, num_epoch,
+    def __init__(self, 
+                 model, 
+                optimizer,
+                lr, 
+                criterion, 
+                num_epoch,
                 dataloaders, 
-                scheduler=None,device='cuda',
+                model_path,
+                scheduler=None,
+                device='cuda',
                 model_kwargs = None,
-                criterion_kwargs= {"num_classes": 2, "epsilon": 1e-6}):
+                criterion_kwargs= {"num_classes": 3, "epsilon": 1e-6}):
         """
     Initializes the trainer object with all necessary components for training and validation.
 
@@ -45,6 +50,7 @@ class trainer:
         self.dataloaders = dataloaders
         self.scheduler = scheduler
         self.device = device
+        self.model_path = model_path
         self.model_kwargs = model_kwargs if model_kwargs is not None else {}
         
         # Calculate and store dataset sizes:
@@ -59,8 +65,9 @@ class trainer:
         self.val_iou_epoch_list = []
 
     ## these are the train, train_epoch and val_epoch functions we need:
-    def train(self, k=1):
+    def train(self):
         for epoch in tqdm(range(self.num_epoch), desc="Epochs"):
+            self.scheduler.step(epoch)
             # train and validation step for i'th epoch
             avg_epoch_train_loss = self.train_epoch(epoch=epoch)
             avg_epoch_val_loss, avg_epoch_val_dice, avg_epoch_val_iou = self.val_epoch()# unpack all three values returned by val_epoch
@@ -72,10 +79,10 @@ class trainer:
             # accumulate metrics
             self.val_dice_epoch_list.append(avg_epoch_val_dice)
             self.val_iou_epoch_list.append(avg_epoch_val_iou)
-
-            if (epoch + 1) % k == 0:
-                print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f}")
-
+            print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f}"
+                      f"Val Dice: {avg_epoch_val_dice}, Val IoU : {avg_epoch_val_iou}")
+        
+        self.save_model()
 
     def train_epoch(self, epoch=None):
         # training mode
@@ -139,15 +146,43 @@ class trainer:
         avg_dice = dice_cum / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
         avg_iou = iou_cum / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
 
-        return avg_epoch_val_loss, avg_dice, avg_iou # return average val epoch loss
-        #return avg_epoch_val_loss 
-
+        return avg_epoch_val_loss, avg_dice, avg_iou 
 
     def test(self):
-        pass
+        # evaluation mode
+        self.model.eval()  
+        # initialise cumulative loss and num_minibatch counter
+        loss_ith_epoch_minibatch_val_cummul = 0.0
+        dice_cum = 0.0 # cumulative
+        iou_cum = 0.0 # cumulative
+
+        # no-grad mode
+        with torch.no_grad():
+            for minibatch_input, truth in self.dataloaders['test']:
+                # move to device
+                minibatch_input, truth = minibatch_input.to(self.device), truth.to(self.device)
+                # forward pass
+                output_val_minibatch = self.model(minibatch_input, **self.model_kwargs)
+
+                # validation loss
+                loss_val, dice_score, iou_score = self.criterion(output_val_minibatch, truth,
+                                    **{**self.criterion_kwargs, "return_metrics": True})
+                
+                batch_size = minibatch_input.size(0)
+                # accumulate loss for average caln later
+                loss_ith_epoch_minibatch_val_cummul += loss_val.item() * batch_size
+                # accumulate metrics
+                dice_cum += dice_score.item() if isinstance(dice_score, torch.Tensor) else dice_score
+                iou_cum += iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score
+
+        # calculate average test loss for the epoch
+        avg_epoch_val_loss = loss_ith_epoch_minibatch_val_cummul / self.dataset_sizes['test'] if self.dataset_sizes['test'] > 0 else 0
+        # calculate average metrics
+        avg_dice = dice_cum / self.dataset_sizes['test'] if self.dataset_sizes['test'] > 0 else 0
+        avg_iou = iou_cum / self.dataset_sizes['test'] if self.dataset_sizes['test'] > 0 else 0
+
+        return avg_epoch_val_loss, avg_dice, avg_iou 
 
     def save_model(self):
-        pass
-
-    def load_model(self):
-        pass
+        torch.save(self.model.state_dict(), self.model_path)
+        print(f"Save model to path {self.model_path}")
