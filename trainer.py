@@ -67,7 +67,8 @@ class trainer:
     ## these are the train, train_epoch and val_epoch functions we need:
     def train(self):
         for epoch in tqdm(range(self.num_epoch), desc="Epochs"):
-            self.scheduler.step(epoch)
+            if self.scheduler is not None:
+                self.scheduler.step()
             # train and validation step for i'th epoch
             avg_epoch_train_loss = self.train_epoch(epoch=epoch)
             avg_epoch_val_loss, avg_epoch_val_dice, avg_epoch_val_iou = self.val_epoch()# unpack all three values returned by val_epoch
@@ -79,8 +80,8 @@ class trainer:
             # accumulate metrics
             self.val_dice_epoch_list.append(avg_epoch_val_dice)
             self.val_iou_epoch_list.append(avg_epoch_val_iou)
-            print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f}"
-                      f"Val Dice: {avg_epoch_val_dice}, Val IoU : {avg_epoch_val_iou}")
+            print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f} "
+                      f"| Val Dice: {avg_epoch_val_dice} | Val IoU : {avg_epoch_val_iou}")
         
         self.save_model()
 
@@ -120,6 +121,7 @@ class trainer:
         loss_ith_epoch_minibatch_val_cummul = 0.0
         dice_cum = 0.0 # cumulative
         iou_cum = 0.0 # cumulative
+        num_batches = 0
 
         # no-grad mode
         with torch.no_grad():
@@ -139,12 +141,13 @@ class trainer:
                 # accumulate metrics
                 dice_cum += dice_score.item() if isinstance(dice_score, torch.Tensor) else dice_score
                 iou_cum += iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score
+                num_batches += 1
 
         # calculate average val loss for the epoch
         avg_epoch_val_loss = loss_ith_epoch_minibatch_val_cummul / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
         # calculate average metrics
-        avg_dice = dice_cum / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
-        avg_iou = iou_cum / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
+        avg_dice = dice_cum / num_batches if num_batches > 0 else 0
+        avg_iou = iou_cum / num_batches if num_batches > 0 else 0
 
         return avg_epoch_val_loss, avg_dice, avg_iou 
 
@@ -174,12 +177,13 @@ class trainer:
                 # accumulate metrics
                 dice_cum += dice_score.item() if isinstance(dice_score, torch.Tensor) else dice_score
                 iou_cum += iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score
+                num_batches += 1
 
         # calculate average test loss for the epoch
         avg_epoch_val_loss = loss_ith_epoch_minibatch_val_cummul / self.dataset_sizes['test'] if self.dataset_sizes['test'] > 0 else 0
         # calculate average metrics
-        avg_dice = dice_cum / self.dataset_sizes['test'] if self.dataset_sizes['test'] > 0 else 0
-        avg_iou = iou_cum / self.dataset_sizes['test'] if self.dataset_sizes['test'] > 0 else 0
+        avg_dice = dice_cum / num_batches if num_batches > 0 else 0
+        avg_iou = iou_cum / num_batches if num_batches > 0 else 0
 
         return avg_epoch_val_loss, avg_dice, avg_iou 
 
