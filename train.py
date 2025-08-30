@@ -12,9 +12,8 @@ import torch.nn as nn
 from transformers import ViTModel
 
 from lora_vit import LoraVit
-from segmentation import SegViT, CustomSegHead
-from pet_dataset_class import PreprocessedPetDataset
-from create_dataloaders import get_pet_dataloaders
+from segmentation import SegViT
+from dataset import PreprocessedPetDataset, get_pet_dataloaders
 from trainer import trainer
 from loss_and_metrics_seg import *
 
@@ -24,7 +23,7 @@ def main():
     parser.add_argument('--model_path', default='models/')
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--epochs', default=30, type=int)
-    parser.add_argument('--batch_size', default=24, type=int)
+    parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--rank', default=4, type=int)
     parser.add_argument('--image_dir', default='pet_dataset/resized_images')
     parser.add_argument('--mask_dir', default='pet_dataset/resized_masks')    
