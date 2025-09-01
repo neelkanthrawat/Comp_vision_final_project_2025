@@ -98,7 +98,7 @@ class trainer:
             self.val_iou_epoch_list.append(avg_epoch_val_iou)
 
             if (epoch + 1) % k == 0:
-                print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f}")
+                print(f"Epoch [{epoch+1}/{self.num_epoch}] - Train Loss: {avg_epoch_train_loss:.4f} | Val Loss: {avg_epoch_val_loss:.4f} | Dice score: {avg_epoch_val_dice} |IOU score: {avg_epoch_val_iou:.7f} ")
 
 
     def train_epoch(self, epoch=None):
