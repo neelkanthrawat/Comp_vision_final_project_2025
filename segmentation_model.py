@@ -39,6 +39,14 @@ class SegViT(nn.Module):
     def num_trainable_params(self):
         """Number of trainable parameters in the model."""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
+    
+    @property
+    def backbone_parameters(self):
+        return self.vit.parameters()
+
+    @property
+    def head_parameters(self):
+        return self.seg_head.parameters()
 
     # note for me: maybe have an argument stating whether wanna remove the extra class token or not (if it is already removed)
     def forward(self, x): # shape of x: (B,N+1,D)
