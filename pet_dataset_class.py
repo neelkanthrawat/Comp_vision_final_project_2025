@@ -23,9 +23,11 @@ class PreprocessedPetDataset(torch.utils.data.Dataset):
         img_tensor = T.ToTensor()(img)
         img_tensor = T.Normalize(mean=[0.5]*3, std=[0.5]*3)(img_tensor)
 
+
         mask_tensor = T.PILToTensor()(mask).long().squeeze()  # squeeze to remove extra channel # shape: (H, W)
 
-        # Remap: 1 → 0, 2 → 1, 3 → 2
+        # Remap: 1 → 0, 2 → 1, 3 → 2 
+        # note: this remap is segmentation mask with remapped label values
         remapped = torch.zeros_like(mask_tensor)
         remapped[mask_tensor == 1] = 0 # foreground
         remapped[mask_tensor == 2] = 1 # background
