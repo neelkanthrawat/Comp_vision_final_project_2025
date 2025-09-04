@@ -112,12 +112,7 @@ class SerialLoraVit(nn.Module):
         return x
 
 
-#
-import torch
-import torch.nn as nn
-from torch import Tensor
-from safetensors.torch import save_file, load_file
-from serial_lora import SerialLoraLayer  # your separate Serial LoRA implementation
+# 2nd implementation
 
 class SerialLoraVitPrintable(nn.Module):
     """
@@ -200,13 +195,7 @@ class SerialLoraVitPrintable(nn.Module):
                 x = block(x, **kwargs)
         return x
     
-### third idea:
-import torch
-import torch.nn as nn
-from torch import Tensor
-from safetensors.torch import save_file, load_file
-from serial_lora import SerialLoraLayer  # your separate Serial LoRA implementation
-
+### third implementation idea:
 class SerialLoraInjectedLinear(nn.Module):
     """
     Wraps an nn.Linear layer to apply Serial LoRA: (I + BA)x before linear projection
