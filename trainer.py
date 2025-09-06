@@ -9,7 +9,7 @@ from typing import Optional
 
 class trainer:
     def __init__(self, model, 
-                optimizer,lr, 
+                optimizer, 
                 criterion, num_epoch,
                 dataloaders, 
                 device='cuda',
@@ -24,7 +24,6 @@ class trainer:
     Args:
         model: The PyTorch model to be trained.
         optimizer: The optimizer used to update model parameters.
-        lr: Learning rate for the optimizer.
         criterion: Loss function used for both training and validation.
         num_epoch: Number of epochs to train the model.
         dataloaders (dict): Dictionary containing 'train' and 'val' DataLoader objects.
@@ -43,7 +42,6 @@ class trainer:
         self.model = model
         self.optimizer = optimizer
         # learning rates of 2 different groups:
-        self.lr = lr# I think we need to remove this. we do not need it seperately
         self.lr_groups = [pg['lr'] for pg in optimizer.param_groups]# self.lr_groups[0] is LR for backbone and self.lr_groups[1] is LR for head
         self.criterion = criterion
         self.criterion_kwargs= criterion_kwargs 
