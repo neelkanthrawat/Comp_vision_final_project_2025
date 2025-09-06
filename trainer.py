@@ -16,7 +16,7 @@ class trainer:
                 use_trap_scheduler=False,
                 model_kwargs = None,
                 criterion_kwargs= {"num_classes": 2, "epsilon": 1e-6},
-                want_backbone_frozen_intially: bool = False,
+                want_backbone_frozen_initially: bool = False,
                 freeze_epochs: Optional[int] = None):
         """
     Initializes the trainer object with all necessary components for training and validation.
@@ -62,10 +62,10 @@ class trainer:
             self._setup_trapezoid_scheduler()
 
         # These are for the case when one wants to freeze the vit-backbone for a few epochs initially
-        self.want_backbone_frozen_intially = want_backbone_frozen_intially
-        if self.want_backbone_frozen_intially:
+        self.want_backbone_frozen_initially = want_backbone_frozen_initially
+        if self.want_backbone_frozen_initially:
             if freeze_epochs is None:
-                raise ValueError("freeze_epochs must be provided if want_backbone_frozen_intially=True")
+                raise ValueError("freeze_epochs must be provided if want_backbone_frozen_initially=True")
             self.freeze_epochs = freeze_epochs
             # freeze backbone initially
             self.freeze_backbone() #DEFINE THESE FUNCTIONS
@@ -73,8 +73,8 @@ class trainer:
         else:
             self.freeze_epochs = None
             # train all parameters from the start
-            self.reinit_optimizer(head_only=False)
-
+            # self.reinit_optimizer(head_only=False) # I already have self.optimizer initialised above, so no need to add it here
+            
         ## error terms:
         self.train_error_epoch_list = []
         self.val_error_epoch_list = []
@@ -112,13 +112,26 @@ class trainer:
         OptimClass = type(self.optimizer)
         if head_only:
             params = self.model.head_parameters
-            lr = self.lr_groups[1]  # head LR
-            self.optimizer = OptimClass([{"params": params, "lr": lr}])
+            if len(self.lr_groups)==1:
+                # when the input parameter of optimizer is mentioned as vit_seg_model.parameters()
+                lr = self.lr_groups[0]
+                self.optimizer = OptimClass([{"params": params, "lr": lr}])
+            elif len(self.lr_groups)==2: 
+                # different learning rate for training of backbone and head (backbone and head parameters are seperate input for the optimizer obviously). 
+                lr = self.lr_groups[1]  # head LR
+                self.optimizer = OptimClass([{"params": params, "lr": lr}])
         else:
-            params = [
-                {"params": self.model.backbone_parameters, "lr": self.lr_groups[0]},
-                {"params": self.model.head_parameters, "lr": self.lr_groups[1]}
-            ]
+            if len(self.lr_groups)==1:
+                # when the input parameter of optimizer is mentioned as vit_seg_model.parameters()
+                params = [
+                    {"params": self.model.parameters(), "lr": self.lr_groups[0]}
+                        ]
+            elif len(self.lr_groups)==2:
+                # different learning rate for training of backbone and head (backbone and head parameters are seperate input for the optimizer obviously).
+                params = [
+                    {"params": self.model.backbone_parameters, "lr": self.lr_groups[0]},
+                    {"params": self.model.head_parameters, "lr": self.lr_groups[1]}
+                        ]
             self.optimizer = OptimClass(params)
 
 
@@ -126,7 +139,7 @@ class trainer:
     def train(self, k=1):
         for epoch in tqdm(range(self.num_epoch), desc="Epochs"):
             ## unfreeze after freeze_epochs
-            if self.want_backbone_frozen_intially and epoch == self.freeze_epochs:
+            if self.want_backbone_frozen_initially and epoch == self.freeze_epochs:
                 print(f" Unfreezing backbone at epoch {epoch+1}")
                 self.unfreeze_backbone()
                 self.reinit_optimizer(head_only=False)
