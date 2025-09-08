@@ -140,11 +140,3 @@ class LoraVit(nn.Module):
         run the LoRA vit
         """
         return self.model_vit_lora(x, **kwargs)
-    
-
-# here we need to add code to introduce some model for the 
-class SerialLoRALayer(nn.Module):
-    pass
-
-class SerialLoraVit():
-    pass
