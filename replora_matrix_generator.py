@@ -43,7 +43,8 @@ class RepLoRAGenerator(nn.Module):
         ## reshape into matrices
         if self.kind == "A":
             A_q = raw_q.view(self.dim,self.r)   # shape: (dim, r)
-            A_v = raw_v.view(self.dim,self.r)   # shape: (dim,r)            return A_q, A_v
+            A_v = raw_v.view(self.dim,self.r)   # shape: (dim,r)            
+            return A_q, A_v
         else: # This is for B
             B_q = raw_q.view(self.r, self.dim)   # shape: (r, dim)
             B_v = raw_v.view(self.r, self.dim)   # shape: (r, dim)
