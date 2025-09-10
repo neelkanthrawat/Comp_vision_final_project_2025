@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-from replora_generator import RepLoRAGenerator
+from replora_matrix_generator import RepLoRAGenerator
 from replora_layer import RepLoraLayer  # the one with target="q"/"v"
 from safetensors.torch import save_file, load_file
 
