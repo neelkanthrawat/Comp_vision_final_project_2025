@@ -3,7 +3,7 @@ import torch
 from torch import Tensor
 import math
 from safetensors.torch import save_file, load_file
-from serial_lora import SerialLoraLayer  # your separate Serial LoRA implementation
+from Serial_lora_layer import SerialLoraLayer  # your separate Serial LoRA implementation
 
 class SerialLoraVit(nn.Module):
     """ 
