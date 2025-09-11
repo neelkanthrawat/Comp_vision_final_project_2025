@@ -17,7 +17,7 @@ class RepLoRAGenerator(nn.Module):
         self.seed = nn.Parameter(torch.randn(r))
 
         # shared trunk MLP
-        hidden_dim = max(4 * r, 64)
+        hidden_dim = max(4 * r, 768)
         self.trunk = nn.Sequential(
             nn.Linear(r, hidden_dim),
             nn.ReLU(),
