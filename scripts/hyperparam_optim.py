@@ -33,7 +33,7 @@ from create_dataloaders import get_pet_dataloaders
 from trainer import trainer
 
 # loss and metrics
-from loss_and_metrics_seg import * # idk what to import here tbh. Need to look into it
+from scripts.trainer.loss_and_metrics_seg import * # idk what to import here tbh. Need to look into it
 
 # data plotting
 from data_plotting import plot_random_images_and_trimaps_2
@@ -41,8 +41,9 @@ from data_plotting import plot_random_images_and_trimaps_2
 #
 from typing import Literal
 
-# for parsing
 
+
+# for parsing
 
 
 # global parameters

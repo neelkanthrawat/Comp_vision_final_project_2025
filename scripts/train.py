@@ -19,7 +19,7 @@ from segmentation import SegViT
 
 from dataset import PreprocessedPetDataset, get_pet_dataloaders
 from trainer import trainer
-from loss_and_metrics_seg import *
+from scripts.trainer.loss_and_metrics_seg import *
 
 from typing import Optional
 
