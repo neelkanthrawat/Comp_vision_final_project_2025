@@ -41,8 +41,8 @@ def main():
     parser.add_argument('--mask_dir', default='pet_dataset/resized_masks')    
     ## single_training or seperate training
     parser.add_argument('--seperate_learning_rate', default=False, type=bool)
-    parser.add_argument("-- lr_vit_backbone", default=1e-4, type=float)
-    parser.add_argument("lr_seg_head", default=5e-4, type=float)
+    parser.add_argument("--lr_vit_backbone", default=1e-4, type=float)
+    parser.add_argument("--lr_seg_head", default=5e-4, type=float)
     ## whether wanna freeze the lora layers for a few epochs
     parser.add_argument("--want_backbone_frozen_initially", default=False, type=bool)
     parser.add_argument("--freeze_epochs", default=None,type=Optional[int])
@@ -70,7 +70,7 @@ def main():
         lora_vit_base = LocalizedLoraVit(vit_model=vit_pretrained,
                                 r_block=args.r_block,
                                 alpha=args.alpha,
-                                num_blocks_per_row=args.num_blocks)
+                                num_blocks_per_row=args.num_blocks_per_row)
     else:
         raise("Lora type is not implemented")
 
