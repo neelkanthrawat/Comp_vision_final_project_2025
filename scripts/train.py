@@ -10,14 +10,11 @@ import torch.optim as optim
 import torch.nn as nn
 
 from transformers import ViTModel
-from scripts.lora_types.lora_vit import LoraVit
-from scripts.lora_types.serial_lora_vit import SerialLoraVit
-from scripts.lora_types.localised_lora_vit import LocalizedLoraVit
-from model.segmentation_model import SegViT
 
-from scripts.data.create_dataloaders import get_pet_dataloaders
-from scripts.data.pet_dataset_class import PreprocessedPetDataset
-from trainer import trainer
+from model.segmentation_model import SegViT
+import scripts.data
+import scripts.lora_types
+from scripts.trainer.trainer import trainer
 from scripts.trainer.loss_and_metrics_seg import *
 
 from typing import Optional
@@ -61,10 +58,6 @@ def main():
     elif args.lora_type == "serial_lora":
         lora_vit_base = SerialLoraVit(vit_model=vit_pretrained, 
                             r=args.rank)
-    elif args.lora_type == "replora":
-        lora_vit_base = RepLoraVit(vit_model=vit_pretrained, 
-                            r=args.rank, 
-                            alpha=args.alpha)
     elif args.lora_type == "localised_lora":
         lora_vit_base = LocalizedLoraVit(vit_model=vit_pretrained,
                                 r_block=args.r_block,
