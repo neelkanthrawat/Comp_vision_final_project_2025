@@ -12,11 +12,12 @@ class SegViT(nn.Module):
                     patch_size: int,
                     dim: int, # hidden dimension
                     n_classes: int,
+                    device,
                     head=None, # segmentation model
                     ) -> None:
         super().__init__()
         
-        self.vit = vit_model
+        self.vit = vit_model.to(device)
 
         # Remove classification head if present
         if hasattr(self.vit, "fc"):
@@ -31,7 +32,7 @@ class SegViT(nn.Module):
                 num_classes=n_classes,
                 patch_size=patch_size,
                 image_size=image_size
-            )
+            ).to(device)
         else:
             self.seg_head = head
 

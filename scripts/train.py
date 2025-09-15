@@ -9,15 +9,14 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 
-#
 from transformers import ViTModel
-from lora_vit import LoraVit
-from serial_lora_vit import SerialLoraVit
-from replora_vit import RepLoraVit
-from localised_lora_vit import LocalizedLoraVit
-from segmentation import SegViT
+from scripts.lora_types.lora_vit import LoraVit
+from scripts.lora_types.serial_lora_vit import SerialLoraVit
+from scripts.lora_types.localised_lora_vit import LocalizedLoraVit
+from model.segmentation_model import SegViT
 
-from dataset import PreprocessedPetDataset, get_pet_dataloaders
+from scripts.data.create_dataloaders import get_pet_dataloaders
+from scripts.data.pet_dataset_class import PreprocessedPetDataset
 from trainer import trainer
 from scripts.trainer.loss_and_metrics_seg import *
 

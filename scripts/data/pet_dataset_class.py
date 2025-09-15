@@ -21,7 +21,7 @@ class PreprocessedPetDataset(torch.utils.data.Dataset):
         mask = Image.open(mask_path)
 
         img_tensor = T.ToTensor()(img)
-        img_tensor = T.Normalize(mean=[0.5]*3, std=[0.5]*3)(img_tensor)
+        img_tensor = T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])(img_tensor)
 
 
         mask_tensor = T.PILToTensor()(mask).long().squeeze()  # squeeze to remove extra channel # shape: (H, W)
