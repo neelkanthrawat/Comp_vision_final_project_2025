@@ -12,10 +12,13 @@ import torch.nn as nn
 from transformers import ViTModel
 
 from model.segmentation_model import SegViT
-import scripts.data
-import scripts.lora_types
-from scripts.trainer.trainer import trainer
-from scripts.trainer.loss_and_metrics_seg import *
+from data.create_dataloaders import *
+from  data.pet_dataset_class import *
+from lora_types.lora_vit import LoraVit
+from lora_types.serial_lora_vit import SerialLoraVit
+from lora_types.localized_lora_vit import LocalizedLoraVit
+from trainer.trainer import trainer
+from trainer.loss_and_metrics_seg import *
 
 from typing import Optional
 
