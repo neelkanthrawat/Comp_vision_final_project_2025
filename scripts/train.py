@@ -97,9 +97,6 @@ def main():
 
     criterion = log_cosh_dice_loss
     criterion_kwargs = {"num_classes": 3, "epsilon": 1e-6,}
-
-    ## Scheduler: this needs to be fixed a little bit
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     ## dataloader
     dataloaders={"train": train_dataloader, "val": val_dataloader, "test" : test_dataloader}
 
