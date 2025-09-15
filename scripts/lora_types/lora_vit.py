@@ -3,7 +3,7 @@ import torch
 from torch import Tensor
 import math
 from safetensors.torch import save_file, load_file
-from lora import LoraLayer
+from .lora import LoraLayer
 
 class LoraVit(nn.Module):
     """ 

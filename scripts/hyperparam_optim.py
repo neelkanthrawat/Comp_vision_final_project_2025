@@ -1,4 +1,5 @@
 import os
+import argparse
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -30,7 +31,7 @@ import matplotlib.pyplot as plt
 # global parameters
 MODEL_NAME = 'google/vit-base-patch16-224'
 NUM_BLOCKS = 12
-WEIGHT_DEACY=0.0005
+WEIGHT_DECAY=0.0005
 BATCH_SIZE = 32
 USE_BN=True
 DROPOUT_RATE=0.1
@@ -43,14 +44,14 @@ def objective(
     img_dir,
     mask_dir,
     lora_type: Literal["lora", "serial_lora", "localized_lora"] = "lora", 
-    optimize_for: Literal["loss", "dice", "iou"] = "loss",
+    optimize_for: Literal["loss", "dice", "iou"] = "dice",
     separate_lr = False,
-    want_backbone_frozen_initially=False,
+    backbone_frozen=False,
 ):
     
     # Lora parameters
-    lora_rank = trial.suggest_int("lora_rank", 4, 8, 16, 32)
-    lora_alpha = trial.suggest_int("lora_alpha", 4, 8, 16, 32, 64)
+    lora_rank = trial.suggest_categorical("lora_rank", [4, 8, 16, 32])
+    lora_alpha = trial.suggest_categorical("lora_alpha", [4, 8, 16, 32, 64])
     
     # Optimizer
     optimizer_name = trial.suggest_categorical("optimizer", ["adamw", "adam"]) 
@@ -62,7 +63,7 @@ def objective(
         "lora_rank": lora_rank,
         "lora_alpha": lora_alpha,
         "optimizer": optimizer_name,
-        "want_backbone_frozen_initially": want_backbone_frozen_initially,
+        "backbone_frozen": backbone_frozen,
     }   
 
     # Model initialization
@@ -71,11 +72,9 @@ def objective(
         lora_vit_base = LoraVit(vit_model=Vit_pretrained, r=lora_rank, alpha=lora_alpha)
     elif lora_type == "serial_lora":
         lora_vit_base = SerialLoraVit(vit_model=Vit_pretrained, r=lora_rank)
-    elif lora_type == "replora":
-        lora_vit_base = RepLoraVit(vit_model=Vit_pretrained, r=lora_rank, alpha=lora_alpha)
     elif lora_type == "localized_lora":
-        r_block = trial.suggest_int("r_block", 2,4,8,16 )
-        num_blocks = trial.suggest_int("num_blocks", 2,4,8,16)
+        r_block = trial.suggest_categorical("r_block", [2, 4, 8, 16])
+        num_blocks = trial.suggest_categorical("num_blocks", [2, 4, 8, 16])
         lora_vit_base = LocalizedLoraVit(vit_model=Vit_pretrained,
                                         r_block=r_block,
                                         alpha=lora_alpha,
@@ -103,30 +102,30 @@ def objective(
         all_data=True,
         val_ratio=0.2,
         test_ratio=0.1,
-        BATCH_SIZE=BATCH_SIZE
+        batch_size=BATCH_SIZE
     )
 
     # Learning rate and optimizer
     if separate_lr:
-        lr_backbone = trial.suggest_float("lr_vit_backbone", 1e-5, 1e-4, 1e-3, log=True)
-        lr_head = trial.suggest_float("lr_seg_head", 1e-4, 1e-3, 1e-2, log=True)
+        lr_backbone = trial.suggest_categorical("lr_vit_backbone", [1e-5, 1e-4, 1e-3])
+        lr_head = trial.suggest_categorical("lr_seg_head", [1e-4, 1e-3, 1e-2])
         optimizer = optimizer_cls([
             {"params": vit_seg_model.backbone_parameters, "lr": lr_backbone},
             {"params": vit_seg_model.head_parameters, "lr": lr_head},
-        ], weight_decay=WEIGHT_DEACY)
+        ], weight_decay=WEIGHT_DECAY)
 
         wandb_config.update({
             "lr_vit_backbone": lr_backbone,
             "lr_seg_head": lr_head
         })
     else:
-        lr = trial.suggest_float("lr", 1e-5, 1e-3, log=True)
-        optimizer = optimizer_cls(vit_seg_model.parameters(), lr=lr, weight_decay=WEIGHT_DEACY)
+        lr = trial.suggest_categorical("lr", [1e-5, 1e-4, 1e-3], log=True)
+        optimizer = optimizer_cls(vit_seg_model.parameters(), lr=lr, weight_decay=WEIGHT_DECAY)
         wandb_config.update({"lr": lr})
 
-
-    if want_backbone_frozen_initially:
-        freeze_epochs=trial.suggest_int("freeze_epochs", 2,5,10)
+    freeze_epochs = 0
+    if backbone_frozen:
+        freeze_epochs=trial.suggest_categorical("freeze_epochs", [2,5,10])
         wandb_config.update({
             "freeze_epochs": freeze_epochs
         })
@@ -135,7 +134,7 @@ def objective(
     wandb.init(
         project="Lora_vit_segmentation",
         config=wandb_config,
-        reinit='finish_previous'
+        reinit="finish_previous"
     )
 
     # Trainer
@@ -148,8 +147,8 @@ def objective(
         "use_trap_scheduler":True,
         "device": device,
         "criterion_kwargs": {"num_classes": 3, "epsilon": 1e-6},
-        "want_backbone_frozen_initially":want_backbone_frozen_initially,
-        "freeze_epochs":freeze_epochs # I have fixed it to 3
+        "backbone_frozen":backbone_frozen,
+        "freeze_epochs":freeze_epochs 
     }
 
     trainer_seg_model = trainer(**trainer_input_params)
@@ -185,7 +184,7 @@ def objective(
     elif optimize_for == "iou":
         result = trainer_seg_model.val_iou_epoch_list[-1]
     else:
-        raise ValueError(f"Unknown optimize_for='{optimize_for}'")
+        raise ValueError(f"Unknown optimize_for='dice'")
     
     # finish W&B run
     wandb.finish() 
@@ -193,9 +192,29 @@ def objective(
     return result
 
 def main():
-    study = optuna.create_study(direction="maximize")
-    study.optimize(lambda trial: objective(trial, optimize_for="dice"), n_trials=N_TRIALS)
+    parser = argparse.ArgumentParser(description="Hyperparameter Optimization")
+    parser.add_argument('--lora_type', choices=["lora", "serial_lora", "localized_lora"], default='lora', type=str)
+    parser.add_argument('--image_dir', default='pet_dataset/resized_images')
+    parser.add_argument('--mask_dir', default='pet_dataset/resized_masks')
+    parser.add_argument('--separate_lr', action="store_true")    
+    parser.add_argument("--backbone_frozen", action="store_true")
+    args = parser.parse_args()
 
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    results = {}
+    study = optuna.create_study(direction="maximize")
+    study.optimize(lambda trial: objective(trial, 
+                                           device=device,
+                                           img_dir=args.image_dir,
+                                           mask_dir=args.mask_dir,
+                                           lora_type=args.lora_type,
+                                           separate_lr=args.separate_lr,
+                                           backbone_frozen=args.backbone_frozen,
+                                           optimize_for="dice"), n_trials=N_TRIALS)
+    
+    results[f"{args.lora_type}_dice"] = study.best_value
+    print(f"{args.lora_type} - dice: {study.best_value}")
 
 if __name__ == "__main__":
     main()

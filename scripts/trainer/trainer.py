@@ -12,11 +12,11 @@ class trainer:
                 optimizer, 
                 criterion, num_epoch,
                 dataloaders, 
-                device='cuda',
+                device,
                 use_trap_scheduler=False,
                 model_kwargs = None,
                 criterion_kwargs= {"num_classes": 2, "epsilon": 1e-6},
-                want_backbone_frozen_initially: bool = False,
+                backbone_frozen: bool = False,
                 freeze_epochs: Optional[int] = None):
         """
     Initializes the trainer object with all necessary components for training and validation.
@@ -62,10 +62,10 @@ class trainer:
             self._setup_trapezoid_scheduler()
 
         # These are for the case when one wants to freeze the vit-backbone for a few epochs initially
-        self.want_backbone_frozen_initially = want_backbone_frozen_initially
-        if self.want_backbone_frozen_initially:
+        self.backbone_frozen = backbone_frozen
+        if self.backbone_frozen:
             if freeze_epochs is None:
-                raise ValueError("freeze_epochs must be provided if want_backbone_frozen_initially=True")
+                raise ValueError("freeze_epochs must be provided if backbone_frozen=True")
             self.freeze_epochs = freeze_epochs
             # freeze backbone initially
             self.freeze_backbone() #DEFINE THESE FUNCTIONS
@@ -139,7 +139,7 @@ class trainer:
     def train(self, k=1):
         for epoch in tqdm(range(self.num_epoch), desc="Epochs"):
             ## unfreeze after freeze_epochs
-            if self.want_backbone_frozen_initially and epoch == self.freeze_epochs:
+            if self.backbone_frozen and epoch == self.freeze_epochs:
                 print(f" Unfreezing backbone at epoch {epoch+1}")
                 self.unfreeze_backbone()
                 self.reinit_optimizer(head_only=False)

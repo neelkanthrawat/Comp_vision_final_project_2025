@@ -39,12 +39,12 @@ def main():
     parser.add_argument('--image_dir', default='pet_dataset/resized_images')
     parser.add_argument('--mask_dir', default='pet_dataset/resized_masks')    
     ## single_training or seperate training
-    parser.add_argument('--seperate_learning_rate', default=False, type=bool)
+    parser.add_argument('--seperate_lr', action="store_true")
     parser.add_argument("--lr_vit_backbone", default=1e-4, type=float)
     parser.add_argument("--lr_seg_head", default=5e-4, type=float)
     ## whether wanna freeze the lora layers for a few epochs
-    parser.add_argument("--want_backbone_frozen_initially", default=False, type=bool)
-    parser.add_argument("--freeze_epochs", default=None,type=Optional[int])
+    parser.add_argument("--backbone_frozen", action="store_true")
+    parser.add_argument("--freeze_epochs", default=None, type=Optional[int])
 
     
     args = parser.parse_args()
@@ -108,7 +108,7 @@ def main():
                             dataloaders=dataloaders,
                             device=device,
                             criterion_kwargs=criterion_kwargs,
-                            want_backbone_frozen_initially=args.want_backbone_frozen_initially,
+                            want_backbone_frozen_initially=args.backbone_frozen,
                             freeze_epochs=args.freeze_epochs
                             )
     

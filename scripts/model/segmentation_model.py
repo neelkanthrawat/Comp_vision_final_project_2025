@@ -1,5 +1,5 @@
 import torch.nn as nn
-from segmentation_head import CustomSegHead
+from .segmentation_head import CustomSegHead
 
 class SegViT(nn.Module):
     """
@@ -34,7 +34,7 @@ class SegViT(nn.Module):
                 image_size=image_size
             ).to(device)
         else:
-            self.seg_head = head
+            self.seg_head = head.to(device)
 
     @property
     def num_trainable_params(self):
