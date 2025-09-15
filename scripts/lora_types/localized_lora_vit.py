@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import math
 from safetensors.torch import save_file, load_file
-from localised_lora_layer import LocalizedLoraLayer  # Assume your LocalizedLoRA is in this module
+from localized_lora_layer import LocalizedLoraLayer  # Assume your LocalizedLoRA is in this module
 
 class LocalizedLoraVit(nn.Module):
     """
