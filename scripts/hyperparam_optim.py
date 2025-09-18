@@ -31,12 +31,11 @@ import matplotlib.pyplot as plt
 # global parameters
 MODEL_NAME = 'google/vit-base-patch16-224'
 NUM_BLOCKS = 12
-WEIGHT_DECAY=0.0005
 BATCH_SIZE = 32
 USE_BN=True
 DROPOUT_RATE=0.1
-NUM_EPOCHS=10
-N_TRIALS = 5
+NUM_EPOCHS= 20
+N_TRIALS = 20
 
 def objective(
     trial, 
@@ -54,16 +53,16 @@ def objective(
     lora_alpha = trial.suggest_categorical("lora_alpha", [4, 8, 16, 32, 64])
     
     # Optimizer
-    optimizer_name = trial.suggest_categorical("optimizer", ["adamw", "adam"]) 
-    optimizer_cls = torch.optim.AdamW if optimizer_name == "adamw" else torch.optim.Adam
+    optimizer = torch.optim.AdamW
+    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-2, log=True)  
     
     # W&B config
     wandb_config = {
         "lora_type": lora_type,
         "lora_rank": lora_rank,
         "lora_alpha": lora_alpha,
-        "optimizer": optimizer_name,
         "backbone_frozen": backbone_frozen,
+        "weight_decay": weight_decay,
     }   
 
     # Model initialization
@@ -107,20 +106,20 @@ def objective(
 
     # Learning rate and optimizer
     if separate_lr:
-        lr_backbone = trial.suggest_categorical("lr_vit_backbone", [1e-5, 1e-4, 1e-3])
-        lr_head = trial.suggest_categorical("lr_seg_head", [1e-4, 1e-3, 1e-2])
-        optimizer = optimizer_cls([
+        lr_backbone = trial.suggest_float("lr_vit_backbone", 1e-5, 1e-3, log=True)
+        lr_head = trial.suggest_float("lr_seg_head", 1e-5, 1e-3, log=True)
+        optimizer = optimizer([
             {"params": vit_seg_model.backbone_parameters, "lr": lr_backbone},
             {"params": vit_seg_model.head_parameters, "lr": lr_head},
-        ], weight_decay=WEIGHT_DECAY)
+        ], weight_decay=weight_decay)
 
         wandb_config.update({
             "lr_vit_backbone": lr_backbone,
             "lr_seg_head": lr_head
         })
     else:
-        lr = trial.suggest_categorical("lr", [1e-5, 1e-4, 1e-3], log=True)
-        optimizer = optimizer_cls(vit_seg_model.parameters(), lr=lr, weight_decay=WEIGHT_DECAY)
+        lr = trial.suggest_float("lr", 1e-5, 1e-3, log=True)
+        optimizer = optimizer(vit_seg_model.parameters(), lr=lr, weight_decay=weight_decay)
         wandb_config.update({"lr": lr})
 
     freeze_epochs = 0
@@ -173,8 +172,15 @@ def objective(
             "val_loss": avg_val_loss,
             "val_dice": avg_val_dice,
             "val_iou": avg_val_iou,
-            "lr": optimizer.param_groups[0]["lr"]
         })
+
+        if separate_lr:
+            wandb.log({
+                "lr_vit_backbone": lr_backbone,
+                "lr_seg_head": lr_head
+            })
+        else:
+            wandb.log({"lr": lr})
 
     # after we train(), in the class trainer_seg_model, validation loss and validation metrics are stored for each epoch as class attributes
     if optimize_for == "loss":
