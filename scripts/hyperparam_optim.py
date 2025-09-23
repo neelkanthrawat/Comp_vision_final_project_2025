@@ -34,7 +34,7 @@ NUM_BLOCKS = 12
 BATCH_SIZE = 32
 USE_BN=True
 DROPOUT_RATE=0.1
-NUM_EPOCHS= 20
+NUM_EPOCHS= 10
 N_TRIALS = 20
 
 def objective(
@@ -54,7 +54,7 @@ def objective(
     
     # Optimizer
     optimizer = torch.optim.AdamW
-    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-2, log=True)  
+    weight_decay = trial.suggest_categorical("weight_decay", [1e-4, 1e-3, 1e-2])  
     
     # W&B config
     wandb_config = {
@@ -106,21 +106,21 @@ def objective(
 
     # Learning rate and optimizer
     if separate_lr:
-        lr_backbone = trial.suggest_float("lr_vit_backbone", 1e-5, 1e-3, log=True)
-        lr_head = trial.suggest_float("lr_seg_head", 1e-5, 1e-3, log=True)
+        lr_backbone = trial.suggest_categorical("lr_vit_backbone", [1e-5, 1e-4,1e-3, 1e-2])
+        lr_head = trial.suggest_categorical("lr_seg_head", [1e-5, 1e-4,1e-3, 1e-2])
         optimizer = optimizer([
             {"params": vit_seg_model.backbone_parameters, "lr": lr_backbone},
             {"params": vit_seg_model.head_parameters, "lr": lr_head},
         ], weight_decay=weight_decay)
 
         wandb_config.update({
-            "lr_vit_backbone": lr_backbone,
-            "lr_seg_head": lr_head
+            "lr_vit_backbone_init": lr_backbone,
+            "lr_seg_head_init": lr_head
         })
     else:
-        lr = trial.suggest_float("lr", 1e-5, 1e-3, log=True)
+        lr = trial.suggest_categorical("lr", [1e-5, 1e-4,1e-3, 1e-2])
         optimizer = optimizer(vit_seg_model.parameters(), lr=lr, weight_decay=weight_decay)
-        wandb_config.update({"lr": lr})
+        wandb_config.update({"lr_init": lr})
 
     freeze_epochs = 0
     if backbone_frozen:
@@ -131,7 +131,7 @@ def objective(
 
     ## Initialize W&B
     wandb.init(
-        project="Lora_vit_segmentation",
+        project="Lora_vit_segmentation_optim_local",
         config=wandb_config,
         reinit="finish_previous"
     )

@@ -1,4 +1,4 @@
-# Define a general trainer and test class for the models
+# Define a general trainer and split class for the models
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -6,12 +6,14 @@ from torch.utils.data import DataLoader
 import os  # likely for model saving/loading
 from tqdm import tqdm
 from typing import Optional
+from pathlib import Path
 
 class trainer:
     def __init__(self, model, 
                 optimizer, 
                 criterion, num_epoch,
                 dataloaders, 
+                model_path,
                 device,
                 use_trap_scheduler=False,
                 model_kwargs = None,
@@ -26,7 +28,7 @@ class trainer:
         optimizer: The optimizer used to update model parameters.
         criterion: Loss function used for both training and validation.
         num_epoch: Number of epochs to train the model.
-        dataloaders (dict): Dictionary containing 'train' and 'val' DataLoader objects.
+        dataloaders (dict): Dictionary containing 'train' and split DataLoader objects.
         use_trap_scheduler (bool): Whether to use a trapezoidal learning rate scheduler.
         device (str): Device to use for training ('cuda' or 'cpu') (default: 'cuda').
         model_kwargs (dict, optional): Additional keyword arguments to pass to the model during the forward pass.
@@ -48,6 +50,7 @@ class trainer:
         self.num_epoch = num_epoch
         self.dataloaders = dataloaders
         self.device = device
+        self.model_path = model_path
         self.model_kwargs = model_kwargs if model_kwargs is not None else {}
         
         # Calculate and store dataset sizes:
@@ -193,7 +196,7 @@ class trainer:
         # return weighted average train epoch loss
         return avg_epoch_train_loss
 
-    def val_epoch(self):
+    def val_epoch(self, split='val'):
         # evaluation mode
         self.model.eval()  
         # initialise cumulative loss and num_minibatch counter
@@ -203,7 +206,7 @@ class trainer:
 
         # no-grad mode
         with torch.no_grad():
-            for minibatch_input, truth in self.dataloaders['val']:
+            for minibatch_input, truth in self.dataloaders[split]:
                 # move to device
                 minibatch_input, truth = minibatch_input.to(self.device), truth.to(self.device)
                 # forward pass
@@ -221,20 +224,19 @@ class trainer:
                 iou_cum += (iou_score.item() if isinstance(iou_score, torch.Tensor) else iou_score) * batch_size
 
         # calculate average val loss for the epoch
-        avg_epoch_val_loss = loss_ith_epoch_minibatch_val_cummul / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
+        avg_epoch_val_loss = loss_ith_epoch_minibatch_val_cummul / self.dataset_sizes[split] if self.dataset_sizes[split] > 0 else 0
         # calculate average metrics
-        avg_dice = dice_cum / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
-        avg_iou = iou_cum / self.dataset_sizes['val'] if self.dataset_sizes['val'] > 0 else 0
+        avg_dice = dice_cum / self.dataset_sizes[split] if self.dataset_sizes[split] > 0 else 0
+        avg_iou = iou_cum / self.dataset_sizes[split] if self.dataset_sizes[split] > 0 else 0
 
         return avg_epoch_val_loss, avg_dice, avg_iou # return average val epoch loss
         #return avg_epoch_val_loss 
 
-
-    def test(self):
-        pass
-
     def save_model(self):
-        pass
+        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+        torch.save(self.model.state_dict(), self.model_path)
+        print(f"Save model to path {self.model_path}")
 
     def load_model(self):
-        pass
+        self.model.load_state_dict(torch.load(self.model_path))
+        print(f"Load model from {self.model_path}")

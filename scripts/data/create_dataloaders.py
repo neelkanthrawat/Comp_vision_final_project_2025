@@ -12,8 +12,7 @@ def get_pet_dataloaders(
     batch_size=16,
     num_workers=4,
     seed=42,
-    all_data = True,
-    num_datapoints = 1000, # when we set all_data to False
+    data_ratio=0.5, # when we set all_data to False
     ):
     """
     Creates PyTorch DataLoaders for the Oxford-IIIT Pet dataset with train, validation, and test splits.
@@ -56,11 +55,8 @@ def get_pet_dataloaders(
     all_files_shuffled = all_files.copy()
     random.shuffle(all_files_shuffled)
 
-    if all_data:
-        total_size = len(all_files_shuffled)
-    else:
-        total_size = min(num_datapoints, len(all_files_shuffled))
-        print(f"[INFO] Using only {total_size} datapoints out of {len(all_files_shuffled)} total files.")
+    total_size = int(len(all_files_shuffled) * data_ratio)
+    print(f"[INFO] Using {data_ratio:.1%} of dataset: {total_size} datapoints out of {len(all_files_shuffled)} total files.")
 
     test_size = int(total_size * test_ratio)
     val_size = int(total_size * val_ratio)
