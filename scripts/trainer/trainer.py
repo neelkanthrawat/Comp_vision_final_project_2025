@@ -57,11 +57,11 @@ class trainer:
         self.dataset_sizes = {split: len(dataloader.dataset) for split, dataloader in dataloaders.items()}
 
         # Following is needed for trapezoidal scheduler 
-        self.num_batches_per_epoch = len(self.dataloaders['train'])
-        self.total_batch_updates = self.num_batches_per_epoch * self.num_epoch
-        self.current_batch_step = 0
         # these are for trapezoidal scheduler
         if use_trap_scheduler:
+            self.num_batches_per_epoch = len(self.dataloaders['train'])
+            self.total_batch_updates = self.num_batches_per_epoch * self.num_epoch
+            self.current_batch_step = 0
             self._setup_trapezoid_scheduler()
 
         # These are for the case when one wants to freeze the vit-backbone for a few epochs initially

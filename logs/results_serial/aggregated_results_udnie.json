@@ -1,0 +1,30 @@
+{
+  "serial_lora_25_out_domain": {
+    "dice_mean": 0.6336173610687256,
+    "dice_std": 0.014220007489123054,
+    "iou_mean": 0.4874378480911255,
+    "iou_std": 0.013316847601979013,
+    "num_seeds": 5
+  },
+  "serial_lora_50_out_domain": {
+    "dice_mean": 0.6019904222488404,
+    "dice_std": 0.12545586778827128,
+    "iou_mean": 0.4666645722389221,
+    "iou_std": 0.10865083525592824,
+    "num_seeds": 5
+  },
+  "serial_lora_75_out_domain": {
+    "dice_mean": 0.6662763900756835,
+    "dice_std": 0.008539927347158431,
+    "iou_mean": 0.5216603960990905,
+    "iou_std": 0.009880299166062078,
+    "num_seeds": 5
+  },
+  "serial_lora_100_out_domain": {
+    "dice_mean": 0.6529047112464905,
+    "dice_std": 0.024526153688404495,
+    "iou_mean": 0.507582346200943,
+    "iou_std": 0.026814129792080043,
+    "num_seeds": 5
+  }
+}
