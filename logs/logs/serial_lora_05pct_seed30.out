@@ -1,0 +1,60 @@
+Active Conda env:                       *  /csghome/sm330/conda_envs/seml_pyt-tf
+Running serial_lora with seed 30 and 0.5 data
+Using cuda
+Train size: 2587, Val size: 739, Test size: 400
+Epoch [1/50] - Train Loss: 0.0937 | Val Loss: 0.0453 | Val Dice: 0.696823211096943 | Val IoU : 0.5609752947971205
+Epoch [2/50] - Train Loss: 0.0457 | Val Loss: 0.0364 | Val Dice: 0.7289686482072038 | Val IoU : 0.5973568573210978
+Epoch [3/50] - Train Loss: 0.0392 | Val Loss: 0.0345 | Val Dice: 0.736559386988938 | Val IoU : 0.6071211871500751
+Epoch [4/50] - Train Loss: 0.0337 | Val Loss: 0.0284 | Val Dice: 0.7610819914828134 | Val IoU : 0.6339440490138063
+Epoch [5/50] - Train Loss: 0.0354 | Val Loss: 0.0318 | Val Dice: 0.7469486408691768 | Val IoU : 0.6175476381194769
+Epoch [6/50] - Train Loss: 0.0396 | Val Loss: 0.0346 | Val Dice: 0.7358439508245826 | Val IoU : 0.602331494768837
+Epoch [7/50] - Train Loss: 0.0326 | Val Loss: 0.0305 | Val Dice: 0.7521911676423637 | Val IoU : 0.6224215329096668
+Epoch [8/50] - Train Loss: 0.0301 | Val Loss: 0.0268 | Val Dice: 0.7677654471545806 | Val IoU : 0.6417434811592102
+Epoch [9/50] - Train Loss: 0.0310 | Val Loss: 0.0294 | Val Dice: 0.7567318926322122 | Val IoU : 0.629678180398412
+Epoch [10/50] - Train Loss: 0.0299 | Val Loss: 0.0280 | Val Dice: 0.7625396270229303 | Val IoU : 0.6355991377236878
+Epoch [11/50] - Train Loss: 0.0302 | Val Loss: 0.0278 | Val Dice: 0.763604353826004 | Val IoU : 0.6364053049816653
+Epoch [12/50] - Train Loss: 0.0292 | Val Loss: 0.0291 | Val Dice: 0.758018963633758 | Val IoU : 0.6311771359108136
+Epoch [13/50] - Train Loss: 0.0289 | Val Loss: 0.0323 | Val Dice: 0.7447038641317932 | Val IoU : 0.6151313830131768
+Epoch [14/50] - Train Loss: 0.0290 | Val Loss: 0.0278 | Val Dice: 0.7634956341473756 | Val IoU : 0.6358308249300646
+Epoch [15/50] - Train Loss: 0.1398 | Val Loss: 0.1813 | Val Dice: 0.379685453253928 | Val IoU : 0.29531155794818603
+Epoch [16/50] - Train Loss: 0.1317 | Val Loss: 0.0314 | Val Dice: 0.7483907487137553 | Val IoU : 0.6185246841510674
+Epoch [17/50] - Train Loss: 0.0312 | Val Loss: 0.0314 | Val Dice: 0.7485807512222672 | Val IoU : 0.6165369427252525
+Epoch [18/50] - Train Loss: 0.0317 | Val Loss: 0.0308 | Val Dice: 0.7507051192375256 | Val IoU : 0.6230448919962159
+Epoch [19/50] - Train Loss: 0.0296 | Val Loss: 0.0291 | Val Dice: 0.757812541537743 | Val IoU : 0.6295491023863765
+Epoch [20/50] - Train Loss: 0.0293 | Val Loss: 0.0285 | Val Dice: 0.7604297911685278 | Val IoU : 0.6326212135316231
+Epoch [21/50] - Train Loss: 0.0295 | Val Loss: 0.0279 | Val Dice: 0.763221005302966 | Val IoU : 0.6353823820857459
+Epoch [22/50] - Train Loss: 0.0360 | Val Loss: 0.0297 | Val Dice: 0.7555543906956468 | Val IoU : 0.6277826226773862
+Epoch [23/50] - Train Loss: 0.0288 | Val Loss: 0.0284 | Val Dice: 0.7610154917340156 | Val IoU : 0.6341563426109387
+Epoch [24/50] - Train Loss: 0.0304 | Val Loss: 0.0285 | Val Dice: 0.7605222420860208 | Val IoU : 0.6334132564245283
+Epoch [25/50] - Train Loss: 0.0289 | Val Loss: 0.0290 | Val Dice: 0.7583470041277606 | Val IoU : 0.6288819901836741
+Epoch [26/50] - Train Loss: 0.0322 | Val Loss: 0.0278 | Val Dice: 0.7633473857007266 | Val IoU : 0.6371410582643078
+Epoch [27/50] - Train Loss: 0.0288 | Val Loss: 0.0276 | Val Dice: 0.7643285478403506 | Val IoU : 0.6370776445681736
+Epoch [28/50] - Train Loss: 0.0284 | Val Loss: 0.0283 | Val Dice: 0.761285273486771 | Val IoU : 0.635109211579066
+Epoch [29/50] - Train Loss: 0.0283 | Val Loss: 0.0288 | Val Dice: 0.759059408278846 | Val IoU : 0.6308652856998418
+Epoch [30/50] - Train Loss: 0.0297 | Val Loss: 0.0274 | Val Dice: 0.7651538758542444 | Val IoU : 0.6380121987791926
+Epoch [31/50] - Train Loss: 0.0320 | Val Loss: 0.0276 | Val Dice: 0.7645748341519067 | Val IoU : 0.638030743002085
+Epoch [32/50] - Train Loss: 0.0285 | Val Loss: 0.0333 | Val Dice: 0.7410513324731096 | Val IoU : 0.6115749855002789
+Epoch [33/50] - Train Loss: 0.0315 | Val Loss: 0.0271 | Val Dice: 0.766555873241089 | Val IoU : 0.6402398665638512
+Epoch [34/50] - Train Loss: 0.0281 | Val Loss: 0.0272 | Val Dice: 0.766168106957282 | Val IoU : 0.6398902192651338
+Epoch [35/50] - Train Loss: 0.0282 | Val Loss: 0.0267 | Val Dice: 0.7683392511491686 | Val IoU : 0.6421774865325959
+Epoch [36/50] - Train Loss: 0.0348 | Val Loss: 0.0341 | Val Dice: 0.737953807326873 | Val IoU : 0.6080335026987512
+Epoch [37/50] - Train Loss: 0.0298 | Val Loss: 0.0297 | Val Dice: 0.7556183767254201 | Val IoU : 0.6256549402728616
+Epoch [38/50] - Train Loss: 0.0290 | Val Loss: 0.0281 | Val Dice: 0.7623374083851929 | Val IoU : 0.6354819791081471
+Epoch [39/50] - Train Loss: 0.0282 | Val Loss: 0.0308 | Val Dice: 0.7514418945099569 | Val IoU : 0.6226413065267674
+Epoch [40/50] - Train Loss: 0.1837 | Val Loss: 0.3634 | Val Dice: 0.09504796190537684 | Val IoU : 0.07476690989264939
+Epoch [41/50] - Train Loss: 0.3648 | Val Loss: 0.3634 | Val Dice: 0.09504798296662564 | Val IoU : 0.07476691960159271
+Epoch [42/50] - Train Loss: 0.3608 | Val Loss: 0.3361 | Val Dice: 0.1334615760912592 | Val IoU : 0.07476691047740402
+Epoch [43/50] - Train Loss: 0.3372 | Val Loss: 0.3634 | Val Dice: 0.0950476141175172 | Val IoU : 0.07476647435126672
+Epoch [44/50] - Train Loss: 0.2967 | Val Loss: 0.0899 | Val Dice: 0.5699285789013554 | Val IoU : 0.4227203178712254
+Epoch [45/50] - Train Loss: 0.0665 | Val Loss: 0.0418 | Val Dice: 0.7094766121755918 | Val IoU : 0.5722469175297449
+Epoch [46/50] - Train Loss: 0.0394 | Val Loss: 0.0340 | Val Dice: 0.7381404344703251 | Val IoU : 0.6053591526248296
+Epoch [47/50] - Train Loss: 0.0342 | Val Loss: 0.0323 | Val Dice: 0.7448713126137388 | Val IoU : 0.6148044383090308
+Epoch [48/50] - Train Loss: 0.0319 | Val Loss: 0.0317 | Val Dice: 0.7475590692966653 | Val IoU : 0.6169982496875871
+Epoch [49/50] - Train Loss: 0.0311 | Val Loss: 0.0307 | Val Dice: 0.7516714924081898 | Val IoU : 0.6225797564638161
+Epoch [50/50] - Train Loss: 0.0299 | Val Loss: 0.0299 | Val Dice: 0.7546451639419318 | Val IoU : 0.6259314377511145
+Save model to path models//serial_lora_30_50.pth
+Load model from models//serial_lora_30_50.pth
+Test Dice 0.7548162031173706, Test IoU 0.6260167407989502
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mserial_lora_30_50[0m at: [34mhttps://wandb.ai/drn201911051920-heidelberg-university/Lora_vit_segmentation_training_add/runs/zztafg3o[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20250927_115259-zztafg3o/logs[0m
