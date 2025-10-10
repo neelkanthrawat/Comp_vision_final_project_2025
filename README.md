@@ -90,7 +90,8 @@ In our transformer model, we introduced these LoRA matrices to the **Query (Q)**
 
 This novel variant introduces a shared low-rank matrix that is **serially composed** with the attention mechanism. It learns a pair of low-rank matrices (**A<sub>s</sub>**, **B<sub>s</sub>**) to directly transform the input features.
 
-![Serial LoRA Architecture](plots/serial_lora_architecture.png](https://github.com/neelkanthrawat/Comp_vision_final_project_2025/blob/main/plots/serial_lora_training.png)
+![serial_lora_architecture](https://github.com/user-attachments/assets/4601d9cd-f45c-466f-b4cf-bb46b0a24bd9)
+
 > *Figure: Serial-LoRA architecture (adapted from Zhong et al., 2025)*
 
 **Key differences from vanilla LoRA:**
