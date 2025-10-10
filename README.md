@@ -1,7 +1,7 @@
 # Investigating Novel LoRA Variants For Vision Transformer-Based Segmentation
 
 ## About the project
-This project focuses on applying Low-Rank Adaptation (LoRA) techniques to Vision Transformer (ViT) models for image segmentation tasks. The main objective is to overcome the computational challenges associated with fine-tuning large-scale ViT models by exploring efficient, parameter-efficient fine-tuning methods.
+This project focuses on applying Low-Rank Adaptation (LoRA) based techniques to Vision Transformer (ViT) models for image segmentation tasks. The main objective is to overcome the computational challenges associated with full-fledged fine-tuning large-scale ViT models by exploring efficient, parameter-efficient fine-tuning methods.
 
 
 ## Installation
