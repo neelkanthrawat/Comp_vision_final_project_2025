@@ -132,7 +132,19 @@ In all three cases above, we followed *Hu et al. (2021)* and initialized:
 - **B** with zeros.
 
 
-### In-domain and Out-of-Domain dataset
+### Datasets used:
+
+**Training dataset:**  We used the Oxford-IIIT Pet dataset (https://www.robots.ox.ac.uk/~vgg/data/pets/),
+ which comprises approximately 200 images per class with
+ varying scale, pose, and lighting conditions. Every image
+ has an associated pixel-level trimap segmentation, consist
+ing of three classes: background, foreground (animal), and
+ an ambiguous boundary region around the animal.
+
+ **🧪OOD-test dataset for OOD-Study:**
+
+We used the **Fast Neural Style Model** (https://github.com/pytorch/examples/tree/main/fast_neural_style/neural_style) for style transfer, generating images of the following three artistic styles: **Candy**, **Rain Princess**, and **Udnie**.
+
 
 ### Hyperparameter optimization
 Automated hyperparameter search using **Optuna** framework:
