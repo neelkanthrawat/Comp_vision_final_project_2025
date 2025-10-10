@@ -36,9 +36,30 @@ conda activate env_name
 ## Documentation
 ### ViT-backbone Architecture
 
-We used the Vision Transformer base-sized ViT-b model, available at huggingface (https://huggingface.co/google/vit-base-patch16-224) as the backbone. It's a transformer encoder model pretrained on a massive image dataset at a resolution of 224x224 pixels. It consists of 12 transformer encoder blocks with an embedding dimension of 768. Each transformer block processes the image patch embeddings through multi-head self-attention and a feed-forward layer. It has approximately $86 M$ trainable parameters.
+We used the Vision Transformer base-sized ViT-b model, available at HuggingFace (https://huggingface.co/google/vit-base-patch16-224) as the backbone. It's a transformer encoder model pretrained on a massive image dataset at a resolution of 224x224 pixels. It consists of 12 transformer encoder blocks with an embedding dimension of 768. Each transformer block processes the image patch embeddings through multi-head self-attention and a feed-forward layer. It has approximately $86 M$ trainable parameters.
 
-### Segmentation head architecture
+### Segmentation Head
+
+**Segmentation head:**  
+Our custom-defined segmentation head architecture is shown below, where  
+- `N = H × W` is the number of image tokens/patches,  
+- `D` is the embedding dimension (768), and  
+- `p` is the patch size (16 in our case).
+
+| Layer | Output Shape | Description |
+|--------|----------------|-------------|
+| Input | B × N × D | — |
+| Reshape / Permute | B × D × H × W | — |
+| Conv2d 3×3 | B × D/2 × H × W | — |
+| BatchNorm* | B × D/2 × H × W | — |
+| ReLU | B × D/2 × H × W | — |
+| Dropout* | B × D/2 × H × W | — |
+| Conv2d 1×1 | B × C × H × W | — |
+| Upsample (bilinear, scale=p) | B × C × (H·p) × (W·p) | — |
+| **Output** | B × C × H_img × W_img | — |
+
+(* indicates optional layers)
+
 
 
 ### LoRA techniques
