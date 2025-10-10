@@ -86,13 +86,13 @@ In our transformer model, we introduced these LoRA matrices to the **Query (Q)**
 
 ---
 
-### 🔁 Serial LoRA
+### 🔁 (Serial LoRA)[https://arxiv.org/abs/2503.17750]
 
 This novel variant introduces a shared low-rank matrix that is **serially composed** with the attention mechanism. It learns a pair of low-rank matrices (**A<sub>s</sub>**, **B<sub>s</sub>**) to directly transform the input features.
 
 ![serial_lora_architecture](https://github.com/user-attachments/assets/4601d9cd-f45c-466f-b4cf-bb46b0a24bd9)
 
-> *Figure: Serial-LoRA architecture (adapted from Zhong et al., 2025)*
+> *Figure: Serial-LoRA architecture (adapted from [Zhong et al., 2025](https://arxiv.org/abs/2503.17750))*
 
 **Key differences from vanilla LoRA:**
 
@@ -107,10 +107,10 @@ This novel variant introduces a shared low-rank matrix that is **serially compos
 
 ---
 
-### 🌐 Localised LoRA
+### 🌐 (Localised LoRA)[https://arxiv.org/abs/2506.00236]
 
 Vanilla LoRA approximates the weight update as a **globally low-rank** matrix, which, while parameter-efficient, may limit expressiveness.  
-To address this, *Barazandeh et al. (2025)* proposed **Localized LoRA**, where weight updates are modeled as **locally low-rank** without drastically increasing the number of trainable parameters.
+To address this, *(Barazandeh et al. (2025))[https://arxiv.org/abs/2506.00236]* proposed **Localized LoRA**, where weight updates are modeled as **locally low-rank** without drastically increasing the number of trainable parameters.
 
 They partition the weight matrix **W** ∈ ℝ<sup>d × d</sup> into **K × K** equally sized blocks, dividing both rows and columns into K segments.  
 Each block *(i, j)* is assigned independent low-rank adapters **A<sub>ij</sub>** ∈ ℝ<sup>r<sub>ij</sub> × d/K</sup> and **B<sub>ij</sub>** ∈ ℝ<sup>d/K × r<sub>ij</sub></sup>.  
