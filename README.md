@@ -49,9 +49,9 @@ We used the Vision Transformer base-sized ViT-b model, available at huggingface 
 Automated hyperparameter search using **Optuna** framework:
 * Optimization Objective: maximize dice score
 * Search Space:
-LoRA rank: [4, 8, 16, 32]
-LoRA alpha: [4, 8, 16, 32, 64]
-Learnig rate: [1e-5, 1e-4,1e-3, 1e-2]
+LoRA rank: [4, 8, 16, 32],
+LoRA alpha: [4, 8, 16, 32, 64],
+Learnig rate: [1e-5, 1e-4,1e-3, 1e-2],
 Weight decay: [4, 8, 16, 32, 64]
 
 Additionally, for Localized LoRA, block rank and the number of block are explored in search space [2, 4, 8, 16]
