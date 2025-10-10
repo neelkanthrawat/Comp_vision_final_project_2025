@@ -117,11 +117,11 @@ For convenience, *r<sub>ij</sub> = r<sub>block</sub>* for all blocks, typically 
 The block-wise operator is defined as:
 
 The block-wise operator is defined as:  
-![Localized LoRA Block Equation](https://latex.codecogs.com/png.latex?\mathcal{B}\left[\{B_{ij},A_{ij}\}_{i,j=1}^{K}\right]=\begin{bmatrix}B_{11}A_{11}&\dots&B_{1K}A_{1K}\\\vdots&\ddots&\vdots\\B_{K1}A_{K1}&\dots&B_{KK}A_{KK}\end{bmatrix})
+![Localized LoRA Block Equation](https://latex.codecogs.com/png.latex?%5Cmathcal%7BB%7D%5Cleft%5B%5C%7BB_%7Bij%7D%2CA_%7Bij%7D%5C%7D_%7Bi%2Cj%3D1%7D%5E%7BK%7D%5Cright%5D%3D%5Cbegin%7Bbmatrix%7D%20B_%7B11%7DA_%7B11%7D%20%26%20%5Cdots%20%26%20B_%7B1K%7DA_%7B1K%7D%20%5C%5C%20%5Cvdots%20%26%20%5Cddots%20%26%20%5Cvdots%20%5C%5C%20B_%7BK1%7DA_%7BK1%7D%20%26%20%5Cdots%20%26%20B_%7BKK%7DA_%7BKK%7D%20%5Cend%7Bbmatrix%7D)
+
 
 and the final weight update becomes:  
-![Localized LoRA Update Equation](https://latex.codecogs.com/png.latex?\mathbf{W}^{*}=\mathbf{W}+\mathcal{B}\left[\{B_{ij},A_{ij}\}_{i,j=1}^{K}\right])
-
+![Localized LoRA Update Equation](https://latex.codecogs.com/png.latex?%5Cmathbf%7BW%7D%5E%7B*%7D%20%3D%20%5Cmathbf%7BW%7D%20%2B%20%5Cmathcal%7BB%7D%5Cleft%5B%5C%7BB_%7Bij%7D%2CA_%7Bij%7D%5C%7D_%7Bi%2Cj%3D1%7D%5E%7BK%7D%5Cright%5D)
 
 ---
 
