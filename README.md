@@ -134,7 +134,7 @@ In all three cases above, we followed *Hu et al. (2021)* and initialized:
 
 ### Datasets used:
 
-**Training dataset:** We used the [Oxford-IIIT Pet Dataset](https://www.robots.ox.ac.uk/~vgg/data/pets/), which includes ~200 images per class with pixel-level trimap segmentations of three classes: **background**, **foreground (animal)**, and **boundary**.
+**📊💾Training dataset:** We used the [Oxford-IIIT Pet Dataset](https://www.robots.ox.ac.uk/~vgg/data/pets/), which includes ~200 images per class with pixel-level trimap segmentations of three classes: **background**, **foreground (animal)**, and **boundary**.
 
 
  **🧪OOD-test dataset for OOD-Study:**
