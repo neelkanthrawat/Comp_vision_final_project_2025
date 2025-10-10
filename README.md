@@ -137,6 +137,8 @@ python scripts/train.py \
 
 ```
 
+Demo notebooks for training the model can be found inside the folder notebooks. It contains the training notebooks for all 3 LoRA techniques (Vanilla LoRA, localised LoRA and serial LoRA).
+
 ### 3. Model Inference
 
 ```python
