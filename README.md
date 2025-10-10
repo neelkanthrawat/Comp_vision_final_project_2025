@@ -100,9 +100,8 @@ This novel variant introduces a shared low-rank matrix that is **serially compos
 2. **Pre-Projection Transformation:**  
    The transformation is applied **before** projection through pre-trained weights, allowing more uniform adaptation across attention components:
 
-   \[
-   \tilde{q} = W_{q/k/v} (I + BA)x = W_{q/k/v}x + W_{q/k/v}BAx
-   \]
+![Serial LoRA Equation](https://latex.codecogs.com/png.latex?\tilde{q}=W_{q/k/v}(I+BA)x=W_{q/k/v}x+W_{q/k/v}BAx)
+
 
 ---
 
@@ -117,20 +116,12 @@ For convenience, *r<sub>ij</sub> = r<sub>block</sub>* for all blocks, typically 
 
 The block-wise operator is defined as:
 
-\[
-\mathcal{B}\left[\{B_{ij}, A_{ij}\}_{i,j=1}^{K}\right] =
-\begin{bmatrix}
-B_{11}A_{11} & \dots & B_{1K}A_{1K} \\
-\vdots & \ddots & \vdots \\
-B_{K1}A_{K1} & \dots & B_{KK}A_{KK}
-\end{bmatrix}
-\]
+The block-wise operator is defined as:  
+![Localized LoRA Block Equation](https://latex.codecogs.com/png.latex?\mathcal{B}\left[\{B_{ij},A_{ij}\}_{i,j=1}^{K}\right]=\begin{bmatrix}B_{11}A_{11}&\dots&B_{1K}A_{1K}\\\vdots&\ddots&\vdots\\B_{K1}A_{K1}&\dots&B_{KK}A_{KK}\end{bmatrix})
 
-and the final weight update becomes:
+and the final weight update becomes:  
+![Localized LoRA Update Equation](https://latex.codecogs.com/png.latex?\mathbf{W}^{*}=\mathbf{W}+\mathcal{B}\left[\{B_{ij},A_{ij}\}_{i,j=1}^{K}\right])
 
-\[
-\mathbf{W}^{*} = \mathbf{W} + \mathcal{B}\left[\{B_{ij}, A_{ij}\}_{i,j=1}^{K}\right]
-\]
 
 ---
 
