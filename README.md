@@ -139,7 +139,7 @@ In all three cases above, we followed *Hu et al. (2021)* and initialized:
 
  **🧪OOD-test dataset for OOD-Study:**
 
-We used the **Fast Neural Style Model** (https://github.com/pytorch/examples/tree/main/fast_neural_style/neural_style) for style transfer, generating images of the following three artistic styles: **Candy**, **Rain Princess**, and **Udnie**.
+We generated differently stylized test images using the [Fast Neural Style Model](https://github.com/pytorch/examples/tree/main/fast_neural_style/neural_style) with three styles: **Candy**, **Rain Princess**, and **Udnie**.
 
 
 ### Hyperparameter optimization
