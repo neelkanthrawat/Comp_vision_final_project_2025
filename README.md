@@ -30,7 +30,7 @@ git clone https://github.com/neelkanthrawat/Comp_vision_final_project_2025.git
 
 ```python
 conda env create -f env.yml
-conda activate env_name
+conda activate lora_env
 ```
 
 ## Documentation
