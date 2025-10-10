@@ -74,9 +74,8 @@ For our project, we focused on the widely-used **LoRA** method and its recently 
 
 LoRA assumes that the weight update ΔW can be approximated by the product of two low-rank matrices:
 
-\[
-\mathbf{W}^{*} = \mathbf{W} + \Delta \mathbf{W} = \mathbf{W} + \mathbf{B}\mathbf{A}
-\]
+![LoRA Equation](https://latex.codecogs.com/png.latex?\mathbf{W}^{*}=\mathbf{W}+\Delta\mathbf{W}=\mathbf{W}+\mathbf{B}\mathbf{A})
+
 
 where  
 - **W** ∈ ℝ<sup>d × d</sup> is the pre-trained weight matrix (kept frozen during fine-tuning), and  
