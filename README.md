@@ -48,12 +48,12 @@ Our custom-defined segmentation head architecture is shown below, where
 
 | Layer | Output Shape | Description |
 |--------|----------------|-------------|
-| Input | B × N × D | — |
-| Reshape / Permute | B × D × H × W | — |
+| Input | B × N × D | embedding O/P from the ViT encoder |
+| Reshape / Permute | B × D × H × W | Appropriate shape for CNN input |
 | Conv2d 3×3 | B × D/2 × H × W | — |
-| BatchNorm* | B × D/2 × H × W | — |
+| BatchNorm* | B × D/2 × H × W | Optional |
 | ReLU | B × D/2 × H × W | — |
-| Dropout* | B × D/2 × H × W | — |
+| Dropout* | B × D/2 × H × W | Optional |
 | Conv2d 1×1 | B × C × H × W | — |
 | Upsample (bilinear, scale=p) | B × C × (H·p) × (W·p) | — |
 | **Output** | B × C × H_img × W_img | — |
@@ -63,6 +63,82 @@ Our custom-defined segmentation head architecture is shown below, where
 
 
 ### LoRA techniques
+
+## Fine-tuning Strategies Used
+
+For our project, we focused on the widely-used **LoRA** method and its recently proposed variants, which enable efficient adaptation of transformer models by injecting trainable low-rank matrices into the attention layers.
+
+---
+
+### 🧩 LoRA
+
+LoRA assumes that the weight update ΔW can be approximated by the product of two low-rank matrices:
+
+\[
+\mathbf{W}^{*} = \mathbf{W} + \Delta \mathbf{W} = \mathbf{W} + \mathbf{B}\mathbf{A}
+\]
+
+where  
+- **W** ∈ ℝ<sup>d × d</sup> is the pre-trained weight matrix (kept frozen during fine-tuning), and  
+- **B** ∈ ℝ<sup>d × r</sup>, **A** ∈ ℝ<sup>r × d</sup> are trainable LoRA matrices,  
+- **r** is the rank.
+
+In our transformer model, we introduced these LoRA matrices to the **Query (Q)** and **Value (V)** sections of each transformer block.
+
+---
+
+### 🔁 Serial LoRA
+
+This novel variant introduces a shared low-rank matrix that is **serially composed** with the attention mechanism. It learns a pair of low-rank matrices (**A<sub>s</sub>**, **B<sub>s</sub>**) to directly transform the input features.
+
+> *Figure: Serial-LoRA architecture (adapted from Zhong et al., 2025)*
+
+**Key differences from vanilla LoRA:**
+
+1. **Shared Adaptation Matrix:**  
+   Unlike LoRA, which applies separate learnable matrices in parallel for each attention component, Serial LoRA learns a **single shared matrix** that acts as a common adjustment — significantly reducing trainable parameters.
+
+2. **Pre-Projection Transformation:**  
+   The transformation is applied **before** projection through pre-trained weights, allowing more uniform adaptation across attention components:
+
+   \[
+   \tilde{q} = W_{q/k/v} (I + BA)x = W_{q/k/v}x + W_{q/k/v}BAx
+   \]
+
+---
+
+### 🌐 Localised LoRA
+
+Vanilla LoRA approximates the weight update as a **globally low-rank** matrix, which, while parameter-efficient, may limit expressiveness.  
+To address this, *Barazandeh et al. (2025)* proposed **Localized LoRA**, where weight updates are modeled as **locally low-rank** without drastically increasing the number of trainable parameters.
+
+They partition the weight matrix **W** ∈ ℝ<sup>d × d</sup> into **K × K** equally sized blocks, dividing both rows and columns into K segments.  
+Each block *(i, j)* is assigned independent low-rank adapters **A<sub>ij</sub>** ∈ ℝ<sup>r<sub>ij</sub> × d/K</sup> and **B<sub>ij</sub>** ∈ ℝ<sup>d/K × r<sub>ij</sub></sup>.  
+For convenience, *r<sub>ij</sub> = r<sub>block</sub>* for all blocks, typically smaller than the global rank in standard LoRA.
+
+The block-wise operator is defined as:
+
+\[
+\mathcal{B}\left[\{B_{ij}, A_{ij}\}_{i,j=1}^{K}\right] =
+\begin{bmatrix}
+B_{11}A_{11} & \dots & B_{1K}A_{1K} \\
+\vdots & \ddots & \vdots \\
+B_{K1}A_{K1} & \dots & B_{KK}A_{KK}
+\end{bmatrix}
+\]
+
+and the final weight update becomes:
+
+\[
+\mathbf{W}^{*} = \mathbf{W} + \mathcal{B}\left[\{B_{ij}, A_{ij}\}_{i,j=1}^{K}\right]
+\]
+
+---
+
+In all three cases above, we followed *Hu et al. (2021)* and initialized:
+- **A** with *Kaiming-uniform initialization*, and  
+- **B** with zeros.
+
 
 ### In-domain and Out-of-Domain dataset
 
