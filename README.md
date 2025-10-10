@@ -25,7 +25,12 @@ conda activate env_name
 ```
 
 ## Documentation
-### ViT Model Architecutre
+### ViT-backbone Architecture
+
+We used the Vision Transformer base-sized (\textit{ViT-b}) model, available at huggingface (https://huggingface.co/google/vit-base-patch16-224) as the backbone. It's a transformer encoder model pretrained on a massive image dataset at a resolution of 224x224 pixels. It consists of 12 transformer encoder blocks with an embedding dimension of 768. Each transformer block processes the image patch embeddings through multi-head self-attention and a feed-forward layer. It has approximately $86 M$ trainable parameters.
+
+### Segmentation head architecture
+
 
 ### LoRA techniques
 
