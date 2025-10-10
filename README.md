@@ -6,8 +6,17 @@ This project focuses on applying Low-Rank Adaptation (LoRA) based techniques to 
 
 ## Installation
 ### Prerequisites
-Python 3.10
+Python 3.10,
 CUDA 12.3
+
+### Main packages
+Pytorch+cuda,
+Transformers model,
+optuna,
+wandb
+
+
+
 
 ### Environment setup
 1. Clone the repository:
